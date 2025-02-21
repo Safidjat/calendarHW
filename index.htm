@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+        *{margin: 0;padding: 0;box-sizing: border-box;}
+        body{height: 100vh; display: flex;align-items: center;}
+        #container{
+            width: 80%;
+            height: 70%;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #cal{
+            width: 50%;
+            height: 60%;
+            box-shadow: 0 0 10px gray;
+            padding: 20px 10px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        #top{
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            button{
+                width: 20px;
+                height: 40px;
+                background-color: #ea0006;
+                border: none;
+                border-radius: 5px;
+                box-shadow: 1px 1px 2px;
+                font-size: 20px;
+                cursor: pointer;
+            }
+        }
+        #tab{width: 100%;height: 100%;display: flex;align-items: center;justify-content: center;}
+        #inps{
+            display: flex;
+            gap: 15px;
+        }
+        .inner{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h2,p{text-align: center;}
+        table{width: 100%;height: auto; max-width: 100%;max-height: 100%;border-collapse: collapse;aspect-ratio: 1 / 1;}
+        td{
+            border: 1px solid black;
+            text-align: center; 
+            cursor: pointer;
+            &:hover{background-color: #ea0006;}
+        }
+        @media only screen and (min-width: 680px){
+            table{width: 80%;}
+        }
+        @media only screen and (min-width: 850px){
+            table{width: 70%;}
+        }
+        @media only screen and (min-width: 950px){
+            table{width: 40%;}
+        }
+        @media only screen and (max-width: 290px){
+            #container{width: 100%;}
+            #cal{width: 90%;}
+            #inps{gap: 5px;}
+        }
+        @media only screen and (max-width: 500px){
+            #inps{flex-wrap: wrap;}
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="cal">
+            <div id="top">
+                <button onclick="cevir(-1)">‹</button>
+                <div id="middle">
+                    <h2></h2>
+                    <p></p>
+                </div>
+                <button onclick="cevir(1)">›</button>
+            </div>
+            <div id="tab"><table id="bottom"></table></div>
+        </div>
+        <div id="inps"></div>
+    </div>
+    
+    <script>
+        const h2=document.querySelector('h2');
+        const p=document.querySelector('p');
+        const table=document.getElementById('bottom');
+        const ar=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+        const inps=document.getElementById('inps');
+        let kod='';
+        for(let i=0;i<ar.length;i++){
+            kod+=`<div class="inner"><span>${ar[i]}</span><input onclick="deyis(${i})" id="x${i}" type="radio" name="one"/></div>`;
+        }
+        inps.innerHTML=kod;
+
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        let d=new Date();
+       // h2.innerHTML=months[d.getMonth()];
+        const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        //p.innerHTML=`${days[d.getDay()].slice(0,3)}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+
+        let month = d.getMonth();
+        let year = d.getFullYear();
+        let update;
+        let arr=[];
+        
+        function cevir(x){
+            month+=x;
+            if(month==12) {month=0; year++}
+            if(month==-1) {month=11; year--}
+            h2.innerHTML=months[month];
+            update=new Date(year,month,1);
+            let current=1;
+        //    if(x==0) current=d.getDate();
+           if(year==d.getFullYear()&&month==d.getMonth()) current=d.getDate();
+            p.innerHTML=`${days[update.getDay()].slice(0,3)}, ${current} ${months[month]} ${year}`;
+            arr=[];
+            for(let i=0;i<update.getDay();i++){
+                arr.push('');
+            }
+            for(let i=1;i<=getDaysInMonth(year, month);i++){
+                arr.push(i);
+            }
+            // if(arr.length<42){
+            //     for(let i=0;i<42-arr.length;i++){
+            //         arr.push('');
+            //     }
+            // }
+            while(arr.length<42){arr.push('&nbsp;');} //'' yazanda cixmir
+            
+            gunler()
+        }
+        cevir(0);
+
+        function gunler(){
+            let kod1='';
+            let say=0;
+            for(let i=0;i<6;i++){
+                kod1+=`<tr>`;
+                for(let j=0;j<days.length;j++){
+                    arr[say]==d.getDate()&&year==d.getFullYear()&&month==d.getMonth() ? kod1+=`<td style="background-color: #ea0006;">${arr[say++]}</td>`:
+                    kod1+=`<td onclick="gun(${arr[say]})">${arr[say++]}</td>`;
+                }
+                kod1+=`</tr>`;
+            }
+            table.innerHTML=kod1;
+        }
+        gunler()
+
+        function getDaysInMonth(year, month) {
+            return new Date(year, month + 1, 0).getDate();//Если указать 0 в качестве дня, объект Date интерпретирует это как последний день предыдущего месяца
+        }
+
+        function deyis(i){
+            month=i;
+            cevir(0);
+        }
+        function gun(say){
+            say==''? '':   p.innerHTML=`${days[update.getDay()].slice(0,3)}, ${say} ${months[month]} ${year}`;
+        }
+    </script>
+</body>
+</html>
