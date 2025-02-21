@@ -170,7 +170,9 @@
             cevir(0);
         }
         function gun(say){
-            say==''? '':   p.innerHTML=`${days[update.getDay()].slice(0,3)}, ${say} ${months[month]} ${year}`;
+            say==''? '':  
+                update=new Date(year,month,say);
+                 p.innerHTML=`${days[update.getDay()].slice(0,3)}, ${say} ${months[month]} ${year}`,
         }
     </script>
 </body>
